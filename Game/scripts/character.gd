@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 @onready var sprite = $AnimatedSprite2D
 @onready var shape = $CollisionShape2D
+@onready var fuelGauge = $"/root/Root/CanvasLayer/MarginContainer/Fuel"
 
 @export var flySpeed = 2000
 @export var pitchSpeed = 2
@@ -15,6 +16,8 @@ var braking = false
 
 var fuelBurn = 1
 var fuel = 200
+
+var worldWidth = 4096
 
 func _ready() -> void:
 	gear()
@@ -51,6 +54,7 @@ func _physics_process(delta: float) -> void:
 		if !braking:
 			velocity = velocity.move_toward(target, delta * acceleration)
 		fuel -= fuelBurn * delta
+		fuelGauge.text = "Fuel: " + str("%.2f" % fuel)
 	else:
 		velocity += get_gravity() * delta
 		velocity.y = minf(velocity.y, 400)
@@ -64,5 +68,10 @@ func _physics_process(delta: float) -> void:
 	#	if flySpeed > 2000:
 	#		await get_tree().create_timer(0.1).timeout
 	#		flySpeed *= 0.8
+	
+	if global_position.x < 0:
+		global_position.x += worldWidth
+	elif global_position.x > worldWidth:
+		global_position.x -= worldWidth
 	
 	move_and_slide()
